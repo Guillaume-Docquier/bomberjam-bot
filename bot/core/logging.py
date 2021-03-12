@@ -1,4 +1,5 @@
 import logging
+import inspect
 from datetime import datetime
 from pathlib import Path
 
@@ -28,7 +29,7 @@ def log(content):
     """
     global LOGGING_CONFIGURED
     if LOGGING_CONFIGURED:
-        logging.debug(content)
+        logging.debug(f"{__get_caller_name()}: {content}")
 
 
 def __get_logging_file_name__(file_id):
@@ -40,3 +41,9 @@ def __get_logging_file_name__(file_id):
     :return: str
     """
     return f"logs/{datetime.now().strftime('%Y%m%d%H%M%S')}-{file_id}.log"
+
+
+def __get_caller_name():
+    frame = inspect.stack()[2]
+    module = inspect.getmodule(frame[0])
+    return module.__name__

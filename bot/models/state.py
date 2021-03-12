@@ -57,3 +57,6 @@ class State(JSONSerializable):
         dict_copy['tiles'] = dict_copy['tiles'].tolist()
 
         return dict_copy
+
+    def includes(self, position):
+        return 0 <= position.x < self.width and 0 <= position.y < self.height

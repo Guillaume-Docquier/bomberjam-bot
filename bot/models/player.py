@@ -1,4 +1,5 @@
 from core.json_serializable import JSONSerializable
+from .position import Position
 
 
 class Player(JSONSerializable):
@@ -8,8 +9,7 @@ class Player(JSONSerializable):
     Attributes:
         id: The id of the player
         name: The name of the player
-        x: The x coordinate of the player
-        y: The y coordinate of the player
+        position: The (x, y) coordinates of the player
         starting_corner: The starting corner of a player
         bombs_left: The number of bombs a player can still use
         max_bombs: The maximum number of bombs a player can use at a time
@@ -27,8 +27,7 @@ class Player(JSONSerializable):
         """
         self.id = player_json["id"]
         self.name = player_json["name"]
-        self.x = player_json["x"]
-        self.y = player_json["y"]
+        self.position = Position(player_json["x"], player_json["y"])
         self.starting_corner = player_json["startingCorner"]
         self.bombs_left = player_json["bombsLeft"]
         self.max_bombs = player_json["maxBombs"]

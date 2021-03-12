@@ -1,5 +1,6 @@
 from core.enumerable_enum import Enumerable
 from core.json_serializable import JSONSerializable
+from .position import Position
 
 
 class Bonus(JSONSerializable):
@@ -8,8 +9,7 @@ class Bonus(JSONSerializable):
 
     Attributes:
         kind: The Kind of bonus
-        x: The x coordinate of the bonus
-        y: The y coordinate of the bonus
+        position: The (x, y) coordinates of the bonus
     """
 
     def __init__(self, bonus_json):
@@ -17,8 +17,7 @@ class Bonus(JSONSerializable):
         :param bonus_json: A bonus in json formatted dict
         """
         self.kind = bonus_json["kind"]
-        self.x = bonus_json["x"]
-        self.y = bonus_json["y"]
+        self.position = Position(bonus_json["x"], bonus_json["y"])
 
 
 class BonusKind(Enumerable):
