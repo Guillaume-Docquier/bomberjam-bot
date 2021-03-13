@@ -1,3 +1,5 @@
+import random
+
 from core.logging import log
 from models.action import Action
 from .tile_scorer import TileScorer
@@ -11,7 +13,7 @@ class Bot:
     compute_next_action(state) should return an Action given a state.
     You can also add anything you need!
     """
-    NAME = "MyBot"
+    NAME = f"Guid{random.randint(0, 10000)}"
 
     def __init__(self, bot_id):
         self.bot_id = bot_id
@@ -23,11 +25,9 @@ class Bot:
         :param state: The current game state
         :return: Action
         """
-        log(f"Tick: {state.tick}")
-
         my_bot = state.my_bot
-        tile_scorer = TileScorer(state, my_bot.position, my_bot.bomb_range)
         pathfinder = Pathfinder(state, my_bot.position)
+        tile_scorer = TileScorer(state, my_bot.position, my_bot.bomb_range, pathfinder)
 
         best_tile_positions = tile_scorer.get_best_tiles()
         if best_tile_positions is None:

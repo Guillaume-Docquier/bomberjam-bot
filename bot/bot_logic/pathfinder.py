@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 from models.direction import Directions
 from collections import deque
@@ -29,15 +30,14 @@ class Pathfinder:
                         self.distance_matrix[next_position] = next_distance
                         positions_to_explore.appendleft(next_position)
 
-        log(f"\n{self.distance_matrix.transpose()}")
-
     def get_distance_to(self, destination):
         return self.distance_matrix[destination]
 
     def get_closest_position(self, positions):
-        distances = [self.get_distance_to(position) for position in positions]
+        shuffled_positions = random.sample(positions, len(positions))
+        distances = [self.get_distance_to(position) for position in shuffled_positions]
 
-        return positions[np.argmin(distances)]
+        return shuffled_positions[np.argmin(distances)]
 
     def get_path_to(self, destination):
         path = [destination]

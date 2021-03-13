@@ -53,7 +53,9 @@ def play():
     while not state.is_finished:
         try:
             tick = state.tick
+            log(f"Tick: {tick}")
             action = bot.compute_next_action(state)
+            log(f"Action: {action}")
 
             print(ActionCommand(tick, action))
             state = State(input(), bot_id)
