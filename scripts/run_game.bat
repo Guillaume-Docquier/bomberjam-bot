@@ -1,9 +1,10 @@
 @echo off
+set logging=%1
 set scriptsFolder=
-set defaultBotFolder=%1
-set botFolder2=%2
-set botFolder3=%3
-set botFolder4=%4
+set defaultBotFolder=%2
+set botFolder2=%3
+set botFolder3=%4
+set botFolder4=%5
 
 IF DEFINED defaultBotFolder set defaultBotFolder=%defaultBotFolder%\
 IF DEFINED botFolder2 set botFolder2=%botFolder2%\
@@ -17,7 +18,7 @@ IF NOT DEFINED botFolder4 set botFolder4=%defaultBotFolder%
 @echo on
 
 %scriptsFolder%scripts\bomberjam.exe --output replay.json^
- "python %defaultBotFolder%MyBot.py --logging=True"^
- "python %botFolder2%MyBot.py --logging=True"^
- "python %botFolder3%MyBot.py --logging=True"^
- "python %botFolder4%MyBot.py --logging=True"
+ "python %defaultBotFolder%MyBot.py --logging=%logging%"^
+ "python %botFolder2%MyBot.py --logging=%logging%"^
+ "python %botFolder3%MyBot.py --logging=%logging%"^
+ "python %botFolder4%MyBot.py --logging=%logging%"

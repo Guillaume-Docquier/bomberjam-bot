@@ -27,7 +27,7 @@ def is_logging_enabled():
     parser = argparse.ArgumentParser()
     parser.add_argument("--logging", help="Activate logging", default=False)
 
-    return parser.parse_args().logging
+    return parser.parse_args().logging == "True"
 
 
 def play():
