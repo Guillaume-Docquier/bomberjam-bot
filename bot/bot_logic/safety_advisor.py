@@ -14,7 +14,7 @@ def by_countdown(bomb):
 
 class SafetyAdvisor:
     def __init__(self, state):
-        self.bomb_reach_matrix = np.full((state.width, state.height), SAFE)
+        self.bomb_reach_matrix = np.full(state.bounds.shape, SAFE)
 
         for bomb in sorted(state.bombs, key=by_countdown):
             effective_bomb_countdown = min(bomb.countdown, self.bomb_reach_matrix[bomb.position])
@@ -25,7 +25,7 @@ class SafetyAdvisor:
 
                 for _ in range(1, bomb.range + 1):
                     position_to_explore = position_to_explore.apply(direction)
-                    if not state.includes(position_to_explore) or state.tiles[position_to_explore] == Tile.WALL:
+                    if not state.bounds.contains(position_to_explore) or state.tiles[position_to_explore] == Tile.WALL:
                         break
 
                     self.bomb_reach_matrix[position_to_explore] = min(effective_bomb_countdown, self.bomb_reach_matrix[position_to_explore])

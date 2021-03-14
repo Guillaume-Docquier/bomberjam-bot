@@ -2,9 +2,12 @@ import json
 import numpy as np
 
 from core.json_serializable import JSONSerializable
+from models.bounds import Bounds
 from models.player import Player
 from models.bomb import Bomb
 from models.bonus import Bonus
+
+from core.logging import log
 
 
 class State(JSONSerializable):
@@ -18,8 +21,7 @@ class State(JSONSerializable):
         players: A list with all players in the game
         bombs: A list with all bombs in the game
         bonuses: A list with all bonuses in the game
-        width: The width of the map
-        height: The height of the map
+        bounds: A representation of the game bounds (x and y)
         sudden_death_countdown: When the sudden death countdown reaches 0, the sudden death starts
         is_sudden_death_enabled: True when sudden death is active. During sudden death, respawning is disabled
 
@@ -38,11 +40,10 @@ class State(JSONSerializable):
         self.is_finished = json_state["isFinished"]
         self.bombs = [Bomb(bomb_json) for bomb_json in json_state["bombs"].values()]
         self.bonuses = [Bonus(bonus_json) for bonus_json in json_state["bonuses"].values()]
-        self.width = json_state["width"]
-        self.height = json_state["height"]
+        self.bounds = Bounds(json_state["width"], json_state["height"])
         self.sudden_death_countdown = json_state["suddenDeathCountdown"]
         self.is_sudden_death_enabled = json_state["isSuddenDeathEnabled"]
-        self.tiles = np.array(list(json_state["tiles"])).reshape((self.height, self.width)).transpose()
+        self.tiles = np.array(list(json_state["tiles"])).reshape(self.bounds.shape[::-1]).transpose()
 
         all_players = [Player(player_json, self.bombs) for player_json in json_state["players"].values()]
         self.other_players = [player for player in all_players if player.id != current_player_id]
@@ -58,6 +59,3 @@ class State(JSONSerializable):
         dict_copy['tiles'] = dict_copy['tiles'].tolist()
 
         return dict_copy
-
-    def includes(self, position):
-        return 0 <= position.x < self.width and 0 <= position.y < self.height

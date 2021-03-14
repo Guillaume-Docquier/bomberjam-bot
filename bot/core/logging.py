@@ -34,6 +34,18 @@ def log(content):
         logging.debug(f"{__get_caller_name()}: {content}")
 
 
+def error(message="An error occurred"):
+    """
+    Logs the error to fil with the given message. You must call configure_file_logging before using log.
+
+    :param message: A message to go with the error
+    :return: None
+    """
+    global LOGGING_CONFIGURED
+    if LOGGING_CONFIGURED:
+        logging.exception(message)
+
+
 def __get_logging_file_name__(file_id):
     """
     Composes a logging file name. It contains a timestamp followed by a file id.

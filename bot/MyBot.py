@@ -14,8 +14,7 @@ import argparse
 from bot_logic.bot import Bot
 from core.commands import ActionCommand
 from core.commands import RegisterBotCommand
-from core.logging import configure_file_logging
-from core.logging import log
+import core.logging as logging
 from models.state import State
 
 
@@ -45,25 +44,25 @@ def play():
     bot = Bot(bot_id)
 
     if is_logging_enabled():
-        configure_file_logging(f"MyBot-{bot_id}")
+        logging.configure_file_logging(f"MyBot-{bot_id}")
 
-    log(f"Bot name is '{bot_name}' with id '{bot_id}'")
+    logging.log(f"Bot name is '{bot_name}' with id '{bot_id}'")
 
     state = State(input(), bot_id)
     while not state.is_finished:
         try:
             tick = state.tick
-            log(f"Tick: {tick}")
+            logging.log(f"Tick: {tick}")
             action = bot.compute_next_action(state)
-            log(f"Action: {action}")
+            logging.log(f"Action: {action}")
 
             print(ActionCommand(tick, action))
             state = State(input(), bot_id)
-        except Exception as error:
-            log(error)
+        except Exception:
+            logging.error()
             break
 
-    log(f"I died {bot.deaths} times")
+    logging.log(f"I died {bot.deaths} times")
 
 
 play()

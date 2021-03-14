@@ -16,9 +16,9 @@ class Pathfinder:
             blocking_tiles = [Tile.WALL, Tile.BLOCK]
 
         self.state = state
-        self.max_distance = state.width * state.height
+        self.max_distance = state.bounds.shape[0] * state.bounds.shape[1]
         self.safety_advisor = safety_advisor
-        self.distance_matrix = np.full((state.width, state.height), self.max_distance)
+        self.distance_matrix = np.full(state.bounds.shape, self.max_distance)
 
         self.distance_matrix[origin] = 0
 
@@ -30,7 +30,8 @@ class Pathfinder:
                 next_position = position_to_explore.apply(direction)
                 next_distance = self.distance_matrix[position_to_explore] + 1
 
-                if state.includes(next_position) and state.tiles[next_position] not in blocking_tiles:
+                if state.bounds.contains(next_position) and \
+                        state.tiles[next_position] not in blocking_tiles:
                     bomb_at_next_position = next((bomb for bomb in state.bombs if bomb.position == next_position), None)
                     if bomb_at_next_position:
                         next_distance += bomb_at_next_position.countdown
@@ -61,7 +62,7 @@ class Pathfinder:
 
         while distance_left > 1:
             neighbours_positions = [position_to_explore.apply(direction) for direction in Directions.tolist()]
-            valid_neighbours_positions = [neighbour_position for neighbour_position in neighbours_positions if self.state.includes(neighbour_position)]
+            valid_neighbours_positions = [neighbour_position for neighbour_position in neighbours_positions if self.state.bounds.contains(neighbour_position)]
             neighbours_distances = [self.distance_matrix[position] for position in valid_neighbours_positions]
 
             best_neighbour = valid_neighbours_positions[np.argmin(neighbours_distances)]

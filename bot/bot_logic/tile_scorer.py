@@ -23,7 +23,7 @@ class TileScorer:
         self.state = state
         self.pathfinder = pathfinder
         self.safety_advisor = safety_advisor
-        self.score_matrix = np.full((state.width, state.height), UNVISITED)
+        self.score_matrix = np.full(state.bounds.shape, UNVISITED)
         self.bonus_positions = [bonus.position for bonus in state.bonuses]
 
         positions_to_explore = deque([origin])
@@ -34,7 +34,7 @@ class TileScorer:
             for direction in Directions.tolist():
                 next_position = position_to_explore.apply(direction)
 
-                if state.includes(next_position) and state.tiles[next_position] not in blocking_tiles:
+                if state.bounds.contains(next_position) and state.tiles[next_position] not in blocking_tiles:
                     if self.score_matrix[next_position] == UNVISITED:
                         positions_to_explore.appendleft(next_position)
 
@@ -59,7 +59,7 @@ class TileScorer:
 
             for _ in range(1, bomb_range + 1):
                 position_to_explore = position_to_explore.apply(direction)
-                if not self.state.includes(position_to_explore) or self.state.tiles[position_to_explore] == Tile.WALL:
+                if not self.state.bounds.contains(position_to_explore) or self.state.tiles[position_to_explore] == Tile.WALL:
                     break
 
                 if self.state.tiles[position_to_explore] == Tile.BLOCK:
