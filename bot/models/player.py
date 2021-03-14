@@ -1,6 +1,8 @@
 from core.json_serializable import JSONSerializable
 from .position import Position
 
+from core.logging import log
+
 
 class Player(JSONSerializable):
     """
@@ -21,7 +23,7 @@ class Player(JSONSerializable):
         color: The color of the player
     """
 
-    def __init__(self, player_json):
+    def __init__(self, player_json, all_bombs):
         """
         :param player_json: A player in json formatted dict
         """
@@ -37,3 +39,9 @@ class Player(JSONSerializable):
         self.respawning = player_json["respawning"]
         self.score = player_json["score"]
         self.color = player_json["color"]
+
+        self.next_bomb_in = self.respawning
+
+        my_bomb_countdowns = [bomb.countdown for bomb in all_bombs if bomb.player_id == self.id]
+        if len(my_bomb_countdowns) > 0:
+            self.next_bomb_in = max(self.respawning, min(my_bomb_countdowns))

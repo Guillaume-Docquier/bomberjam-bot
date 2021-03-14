@@ -1,9 +1,11 @@
 import random
 
-from core.logging import log
 from models.action import Action
-from .tile_scorer import TileScorer
+from .safety_advisor import SafetyAdvisor
 from .pathfinder import Pathfinder
+from .tile_scorer import TileScorer
+
+from core.logging import log
 
 
 class Bot:
@@ -25,19 +27,20 @@ class Bot:
         :param state: The current game state
         :return: Action
         """
-        my_bot = state.my_bot
-        pathfinder = Pathfinder(state, my_bot.position)
-        tile_scorer = TileScorer(state, my_bot.position, my_bot.bomb_range, pathfinder)
+        my_player = state.current_player
+        safety_advisor = SafetyAdvisor(state)
+        pathfinder = Pathfinder(state, my_player.position, safety_advisor)
+        tile_scorer = TileScorer(state, my_player.position, my_player.bomb_range, pathfinder, safety_advisor)
 
         best_tile_positions = tile_scorer.get_best_tiles()
         if best_tile_positions is None:
             return Action.STAY
 
         best_tile_position = pathfinder.get_closest_position(best_tile_positions)
-        if best_tile_position == my_bot.position:
+        if best_tile_position == my_player.position:
             return Action.BOMB
 
         path_to_best_tile = pathfinder.get_path_to(best_tile_position)
-        direction = my_bot.position.get_direction_to(path_to_best_tile[0])
+        direction = my_player.position.get_direction_to(path_to_best_tile[0])
 
         return direction.action

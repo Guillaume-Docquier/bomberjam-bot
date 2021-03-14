@@ -36,7 +36,6 @@ class State(JSONSerializable):
 
         self.tick = json_state["tick"]
         self.is_finished = json_state["isFinished"]
-        self.players = [Player(player_json) for player_json in json_state["players"].values()]
         self.bombs = [Bomb(bomb_json) for bomb_json in json_state["bombs"].values()]
         self.bonuses = [Bonus(bonus_json) for bonus_json in json_state["bonuses"].values()]
         self.width = json_state["width"]
@@ -45,7 +44,9 @@ class State(JSONSerializable):
         self.is_sudden_death_enabled = json_state["isSuddenDeathEnabled"]
         self.tiles = np.array(list(json_state["tiles"])).reshape((self.height, self.width)).transpose()
 
-        self.my_bot = next(player for player in self.players if player.id == current_player_id)
+        all_players = [Player(player_json, self.bombs) for player_json in json_state["players"].values()]
+        self.other_players = [player for player in all_players if player.id != current_player_id]
+        self.current_player = [player for player in all_players if player.id == current_player_id][0]
 
     def __get_dict__(self):
         """

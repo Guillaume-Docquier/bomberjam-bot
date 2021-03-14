@@ -1,5 +1,6 @@
 import logging
 import inspect
+import numpy as np
 from datetime import datetime
 from pathlib import Path
 
@@ -15,6 +16,7 @@ def configure_file_logging(file_id):
     """
     global LOGGING_CONFIGURED
 
+    np.set_printoptions(linewidth=np.inf)
     Path("./logs").mkdir(exist_ok=True)
     logging.basicConfig(filename=__get_logging_file_name__(file_id), level=logging.DEBUG)
     LOGGING_CONFIGURED = True

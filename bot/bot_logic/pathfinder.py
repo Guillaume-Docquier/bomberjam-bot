@@ -1,18 +1,20 @@
 import numpy as np
 import random
+from collections import deque
 
 from models.direction import Directions
-from collections import deque
-from core.logging import log
 from models.tile import Tile
+
+from core.logging import log
 
 
 class Pathfinder:
-    def __init__(self, state, origin, blocking_tiles=None):
+    def __init__(self, state, origin, safety_advisor, blocking_tiles=None):
         if blocking_tiles is None:
             blocking_tiles = [Tile.WALL, Tile.BLOCK]
 
         self.state = state
+        self.safety_advisor = safety_advisor
         self.distance_matrix = np.full((state.width, state.height), state.width * state.height)
 
         self.distance_matrix[origin] = 0
