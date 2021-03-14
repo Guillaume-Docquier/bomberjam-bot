@@ -7,6 +7,8 @@ from models.tile import Tile
 
 from core.logging import log
 
+DISTANCE_PENALTY_FOR_PLAYER = 2
+
 
 class Pathfinder:
     def __init__(self, state, origin, safety_advisor, blocking_tiles=None):
@@ -29,6 +31,14 @@ class Pathfinder:
                 next_distance = self.distance_matrix[position_to_explore] + 1
 
                 if state.includes(next_position) and state.tiles[next_position] not in blocking_tiles:
+                    bomb_at_next_position = next((bomb for bomb in state.bombs if bomb.position == next_position), None)
+                    if bomb_at_next_position:
+                        next_distance += bomb_at_next_position.countdown
+                    else:
+                        player_at_next_position = next((player for player in state.other_players if player.position == next_position), None)
+                        if player_at_next_position:
+                            next_distance += DISTANCE_PENALTY_FOR_PLAYER
+
                     if self.distance_matrix[next_position] > next_distance and self.safety_advisor.is_safe(next_position, next_distance):
                         self.distance_matrix[next_position] = next_distance
                         positions_to_explore.appendleft(next_position)
