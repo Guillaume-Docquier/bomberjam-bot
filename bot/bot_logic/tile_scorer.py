@@ -10,6 +10,7 @@ from core.logging import log
 UNVISITED = -99.0
 DANGEROUS_SCORE = -1.0
 BLOCK_SCORE = 1.0
+BONUS_SCORE = 1.0
 
 DISTANCE_IMPORTANCE = 0.1
 
@@ -19,15 +20,16 @@ class TileScorer:
         if blocking_tiles is None:
             blocking_tiles = [Tile.WALL, Tile.BLOCK]
 
+        self.state = state
         self.pathfinder = pathfinder
         self.safety_advisor = safety_advisor
         self.score_matrix = np.full((state.width, state.height), UNVISITED)
+        self.bonus_positions = [bonus.position for bonus in state.bonuses]
 
         positions_to_explore = deque([origin])
-
         while len(positions_to_explore) > 0:
             position_to_explore = positions_to_explore.pop()
-            self.score_matrix[position_to_explore] = self.compute_score(state, position_to_explore, bomb_range)
+            self.score_matrix[position_to_explore] = self.compute_score(position_to_explore, bomb_range)
 
             for direction in Directions.tolist():
                 next_position = position_to_explore.apply(direction)
@@ -46,21 +48,21 @@ class TileScorer:
     def get_score(self, position):
         return self.score_matrix[position]
 
-    def compute_score(self, state, position, bomb_range):
+    def compute_score(self, position, bomb_range):
         distance = self.pathfinder.get_distance_to(position)
-        if self.safety_advisor.is_dangerous(position, when=distance, wait=max(0, state.current_player.next_bomb_in - distance)):
+        if self.safety_advisor.is_dangerous(position, when=distance, wait=max(0, self.state.current_player.next_bomb_in - distance)):
             return DANGEROUS_SCORE
 
-        score = 0.0
+        score = BONUS_SCORE if position in self.bonus_positions else 0.0
         for direction in Directions.tolist():
             position_to_explore = position
 
             for _ in range(1, bomb_range + 1):
                 position_to_explore = position_to_explore.apply(direction)
-                if not state.includes(position_to_explore) or state.tiles[position_to_explore] == Tile.WALL:
+                if not self.state.includes(position_to_explore) or self.state.tiles[position_to_explore] == Tile.WALL:
                     break
 
-                if state.tiles[position_to_explore] == Tile.BLOCK:
+                if self.state.tiles[position_to_explore] == Tile.BLOCK:
                     if self.safety_advisor.is_safe(position_to_explore):
                         score += BLOCK_SCORE
                     break
