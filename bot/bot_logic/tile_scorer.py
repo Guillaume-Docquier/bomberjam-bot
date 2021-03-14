@@ -36,8 +36,6 @@ class TileScorer:
                     if self.score_matrix[next_position] == UNVISITED:
                         positions_to_explore.appendleft(next_position)
 
-        log(f"\n{self.score_matrix.transpose()}")
-
     def get_best_tiles(self):
         max_score = np.amax(self.score_matrix)
         if max_score <= DANGEROUS_SCORE:

@@ -14,12 +14,13 @@ class Pathfinder:
             blocking_tiles = [Tile.WALL, Tile.BLOCK]
 
         self.state = state
+        self.max_distance = state.width * state.height
         self.safety_advisor = safety_advisor
-        self.distance_matrix = np.full((state.width, state.height), state.width * state.height)
+        self.distance_matrix = np.full((state.width, state.height), self.max_distance)
 
         self.distance_matrix[origin] = 0
-        positions_to_explore = deque([origin])
 
+        positions_to_explore = deque([origin])
         while len(positions_to_explore) > 0:
             position_to_explore = positions_to_explore.pop()
 
@@ -28,7 +29,7 @@ class Pathfinder:
                 next_distance = self.distance_matrix[position_to_explore] + 1
 
                 if state.includes(next_position) and state.tiles[next_position] not in blocking_tiles:
-                    if self.distance_matrix[next_position] > next_distance:
+                    if self.distance_matrix[next_position] > next_distance and self.safety_advisor.is_safe(next_position, next_distance):
                         self.distance_matrix[next_position] = next_distance
                         positions_to_explore.appendleft(next_position)
 
@@ -45,6 +46,8 @@ class Pathfinder:
         path = [destination]
         position_to_explore = destination
         distance_left = self.distance_matrix[destination]
+        if distance_left == self.max_distance:
+            return None
 
         while distance_left > 1:
             neighbours_positions = [position_to_explore.apply(direction) for direction in Directions.tolist()]

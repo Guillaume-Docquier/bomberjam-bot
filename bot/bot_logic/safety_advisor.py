@@ -17,7 +17,7 @@ class SafetyAdvisor:
         self.bomb_reach_matrix = np.full((state.width, state.height), SAFE)
 
         for bomb in sorted(state.bombs, key=by_countdown):
-            effective_bomb_countdown = bomb.countdown if self.bomb_reach_matrix[bomb.position] == SAFE else self.bomb_reach_matrix[bomb.position]
+            effective_bomb_countdown = min(bomb.countdown, self.bomb_reach_matrix[bomb.position])
             self.bomb_reach_matrix[bomb.position] = effective_bomb_countdown
 
             for direction in Directions.tolist():
@@ -28,11 +28,9 @@ class SafetyAdvisor:
                     if not state.includes(position_to_explore) or state.tiles[position_to_explore] == Tile.WALL:
                         break
 
-                    self.bomb_reach_matrix[position_to_explore] = effective_bomb_countdown
+                    self.bomb_reach_matrix[position_to_explore] = min(effective_bomb_countdown, self.bomb_reach_matrix[position_to_explore])
                     if state.tiles[position_to_explore] == Tile.BLOCK:
                         break
-
-        log(f"\n{self.bomb_reach_matrix.transpose()}")
 
     def is_dangerous(self, position, when=None, wait=0):
         if when is None:

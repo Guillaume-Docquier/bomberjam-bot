@@ -63,5 +63,7 @@ def play():
             log(error)
             break
 
+    log(f"I died {bot.deaths} times")
+
 
 play()
